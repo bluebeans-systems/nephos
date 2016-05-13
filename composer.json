@@ -1,0 +1,12 @@
+{
+    "name": "bluebeans-systems/nephos",
+    "description" : "Package for accounting transactions",
+    "authors": [
+          {
+            "name": "Ed Ryan R. Alburo",
+            "email": "edryanalburo@gmail.com"
+          }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
