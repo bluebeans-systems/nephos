@@ -1,6 +1,13 @@
 {
     "name": "bluebeans-systems/nephos",
     "description" : "Package for accounting transactions",
+    "license": "LGPL",
+    "keywords": [
+              "laravel",
+              "accounting",
+              "nephos",
+              "transaction"
+            ],
     "authors": [
           {
             "name": "Ed Ryan R. Alburo",
@@ -8,5 +15,13 @@
           }
     ],
     "minimum-stability": "dev",
+    "autoload": {
+      "classmap": [
+        "src"
+      ],
+      "psr-4": {
+        "BluebeansSystems\\Nephos\\": "src/"
+      }
+    },
     "require": {}
 }
