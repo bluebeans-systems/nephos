@@ -7,6 +7,8 @@ use BluebeansSystems\Nephos\Models\Accounts;
 use BluebeansSystems\Nephos\Models\AccountSummary;
 use BluebeansSystems\Nephos\Models\TransactionDetails;
 use BluebeansSystems\Nephos\Models\TransactionSummary;
+use BluebeansSystems\Nephos\Models\GlTransactionDetails;
+use BluebeansSystems\Nephos\Models\GlTransactionSummary;
 use Illuminate\Support\Facades\DB;
 
 class Nephos {
@@ -31,6 +33,14 @@ class Nephos {
      * @var AccountDetails
      */
     private $accountDetails;
+    /**
+     * @var GlTransactionSummary
+     */
+    private $glSummary;
+    /**
+     * @var GlTransactionDetails
+     */
+    private $glDetails;
 
 
     private $controlno;
@@ -42,6 +52,8 @@ class Nephos {
         $this->accounts             = new Accounts();
         $this->accountSummary       = new AccountSummary();
         $this->accountDetails       = new AccountDetails();
+        $this->glSummary            = new GlTransactionSummary();
+        $this->glDetails            = new GlTransactionDetails();
 
         $this->controlno            = 0;
     }
@@ -148,6 +160,48 @@ class Nephos {
                     'amount'            => $transamount
                 ]);
 
+            }
+
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+        }
+
+        DB::commit();
+    }
+
+    /**
+     * Post GL Transaction
+     * @param $data
+     */
+    public function postGlTransaction($data)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            for($i=0;$i<count($data['client']);$i++)
+            {
+
+                if(isset($data['glaccount'][$i]) && count($data['glaccount'][$i]) > 0) {
+                    foreach($data['glaccount'][$i] as $glaccount) {
+
+                        $transamount            = (float) ($data['transamount'][$i] * $glaccount->getGlEntryType->operation);
+
+                        $this->glDetails->create([
+                            'subscription'      => $data['subscription'][0],
+                            'controlno'         => $data['controlno'][0],
+                            'accountclass'      => $data['accountclass'][$i],
+                            'accounttype'       => $data['accounttype'][$i],
+                            'accountentry'      => $data['accountentry'][$i],
+                            'client'            => $data['client'][$i],
+                            'glaccount'         => $glaccount->glaccount,
+                            'glamount'          => $transamount
+                        ]);
+                    }
+                }
             }
 
 
