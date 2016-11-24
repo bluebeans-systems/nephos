@@ -92,7 +92,7 @@ class Nephos {
                 $this->transactionDetails->create([
                     'subscription'          => $data['subscription'][0],
                     'controlno'             => $this->controlno,
-                    'glaccount'             => $data['glaccount'][$i],
+                    'glaccount'             => $data['glaccount'][$i][0]->glaccount,
                     'client'                => $data['client'][$i],
                     'transactionrefno'      => $data['transactionrefno'][0],
                     'accountclass'          => $data['accountclass'][$i],
@@ -189,6 +189,11 @@ class Nephos {
                     foreach($data['glaccount'][$i] as $glaccount) {
 
                         $transamount            = (float) ($data['transamount'][$i] * $glaccount->getGlEntryType->operation);
+
+                        // reversal only
+                        if($data['status'][0]=="4") {
+                            $transamount    =  (float) $transamount > 0 ? $transamount * -1 : $transamount * 1;
+                        }
 
                         $this->glDetails->create([
                             'subscription'      => $data['subscription'][0],
