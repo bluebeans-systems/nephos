@@ -70,38 +70,40 @@ class Nephos {
 
         try {
 
-            $this->controlno      = $this->transactionSummary->where('subscription',$data['subscription'][0])->max('controlno') + 1;
+            $data       = json_decode(json_encode($data));
+
+            $this->controlno      = $this->transactionSummary->where('subscription',$data->subscription)->max('controlno') + 1;
 
             $this->transactionSummary->create([
-                'subscription'          => $data['subscription'][0],
+                'subscription'          => $data->subscription,
                 'controlno'             => $this->controlno,
-                'transactionrefno'      => $data['transactionrefno'][0],
-                'module'                => $data['module'][0],
-                'user'                  => $data['user'][0],
-                'status'                => $data['status'][0],
-                'posted_by'             => $data['posted_by'][0],
-                'explanation'           => $data['explanation'][0],
-                'posted_at'             => $data['posted_at'][0]
+                'transactionrefno'      => $data->refno,
+                'module'                => $data->module,
+                'user'                  => $data->user,
+                'status'                => $data->status,
+                'posted_by'             => $data->posted_by,
+                'explanation'           => $data->explanation,
+                'posted_at'             => $data->posted_at
             ]);
 
-            for($i=0;$i<count($data['client']);$i++)
+            for($i=0;$i<count($data->details->client);$i++)
             {
                 // reversal only
-                $transamount    = $data['status'][0]==4 ? $data['transamount'][$i] > 0 ? $data['transamount'][$i] * -1 : $data['transamount'][$i] * 1 : $data['transamount'][$i];
+                $transamount                = $data->status==4 ? $data->details->transamount[$i] > 0 ? $data->details->transamount[$i] * -1 : $data->details->transamount[$i] * 1 : $data->details->transamount[$i];
 
                 $this->transactionDetails->create([
-                    'subscription'          => $data['subscription'][0],
+                    'subscription'          => $data->subscription,
                     'controlno'             => $this->controlno,
-                    'glaccount'             => $data['glaccount'][$i][0]->glaccount,
-                    'client'                => $data['client'][$i],
-                    'transactionrefno'      => $data['transactionrefno'][0],
-                    'accountclass'          => $data['accountclass'][$i],
-                    'accounttype'           => $data['accounttype'][$i],
-                    'accountentry'          => $data['accountentry'][$i],
+                    'glaccount'             => $data->details->glaccount[$i],
+                    'client'                => $data->details->client[$i],
+                    'transactionrefno'      => $data->refno,
+                    'accountclass'          => $data->details->accountclass[$i],
+                    'accounttype'           => $data->details->accounttype[$i],
+                    'accountentry'          => $data->details->accountentry[$i],
                     'transamount'           => $transamount,
                     'transamountdue'        => $transamount,
-                    'paymentform'           => $data['paymentform'][0],
-                    'transactiontag'        => $data['transactiontag'][0]
+                    'paymentform'           => $data->details->paymentform[$i],
+                    'transactiontag'        => $data->details->transactiontag[$i]
                 ]);
             }
 
@@ -128,34 +130,36 @@ class Nephos {
 
         try {
 
-            for($i=0;$i<count($data['client']);$i++)
+            $data       = json_decode(json_encode($data));
+
+            for($i=0;$i<count($data->details->client);$i++)
             {
                 // Check for existing account
-                $accountno            = $this->accounts->checkAccount($data['subscription'][0],$data['accountclass'][$i],$data['accounttype'][$i],$data['client'][$i]);
+                $accountno            = $this->accounts->checkAccount($data->subscription,$data->details->accountclass[$i],$data->details->accounttype[$i],$data->details->client[$i]);
 
                 // Create new account summary
                 $this->accountSummary->create([
-                    'subscription'      => $data['subscription'][0],
-                    'controlno'         => $data['controlno'][0],
-                    'client'            => $data['client'][$i],
-                    'accountclass'      => $data['accountclass'][$i],
-                    'accounttype'       => $data['accounttype'][$i],
-                    'accountentry'      => $data['accountentry'][$i],
+                    'subscription'      => $data->subscription,
+                    'controlno'         => $data->controlno,
+                    'client'            => $data->details->client,
+                    'accountclass'      => $data->details->accountclass[$i],
+                    'accounttype'       => $data->details->accounttype[$i],
+                    'accountentry'      => $data->details->accountentry[$i],
                     'accountno'         => $accountno,
-                    'user'              => $data['user'][0]
+                    'user'              => $data->user
                 ]);
 
                 // reversal only
-                $transamount    = $data['status'][0]=="4" ? $data['transamount'][$i] > 0 ? $data['transamount'][$i] * -1 : $data['transamount'][$i] * 1 : $data['transamount'][$i];
+                $transamount    = $data->status=="4" ? $data->details->transamount[$i] > 0 ? $data->details->transamount[$i] * -1 : $data->details->transamount[$i] * 1 : $data->details->transamount[$i];
 
                 // Create account details
                 $this->accountDetails->create([
-                    'subscription'      => $data['subscription'][0],
-                    'controlno'         => $data['controlno'][0],
-                    'client'            => $data['client'][$i],
-                    'accountclass'      => $data['accountclass'][$i],
-                    'accounttype'       => $data['accounttype'][$i],
-                    'accountentry'      => $data['accountentry'][$i],
+                    'subscription'      => $data->subscription,
+                    'controlno'         => $data->controlno,
+                    'client'            => $data->details->client[$i],
+                    'accountclass'      => $data->details->accountclass[$i],
+                    'accounttype'       => $data->details->accounttype[$i],
+                    'accountentry'      => $data->details->accountentry[$i],
                     'accountno'         => $accountno,
                     'amount'            => $transamount
                 ]);
@@ -182,31 +186,22 @@ class Nephos {
 
         try {
 
-            for($i=0;$i<count($data['client']);$i++)
+            $data       = json_decode(json_encode($data));
+
+            for($i=0;$i<count($data->details->client);$i++)
             {
+                $transamount    = $data->status=="4" ? $data->details->transamount[$i] > 0 ? $data->details->transamount[$i] * -1 : $data->details->transamount[$i] * 1 : $data->details->transamount[$i];
 
-                if(isset($data['glaccount'][$i]) && count($data['glaccount'][$i]) > 0) {
-                    foreach($data['glaccount'][$i] as $glaccount) {
-
-                        $transamount            = (float) ($data['transamount'][$i] * $glaccount->getGlEntryType->operation);
-
-                        // reversal only
-                        if($data['status'][0]=="4") {
-                            $transamount    =  (float) $transamount > 0 ? $transamount * -1 : $transamount * 1;
-                        }
-
-                        $this->glDetails->create([
-                            'subscription'      => $data['subscription'][0],
-                            'controlno'         => $data['controlno'][0],
-                            'accountclass'      => $data['accountclass'][$i],
-                            'accounttype'       => $data['accounttype'][$i],
-                            'accountentry'      => $data['accountentry'][$i],
-                            'client'            => $data['client'][$i],
-                            'glaccount'         => $glaccount->glaccount,
-                            'glamount'          => $transamount
-                        ]);
-                    }
-                }
+                $this->glDetails->create([
+                    'subscription'      => $data->subscription,
+                    'controlno'         => $data->controlno,
+                    'accountclass'      => $data->details->accountclass[$i],
+                    'accounttype'       => $data->details->accounttype[$i],
+                    'accountentry'      => $data->details->accountentry[$i],
+                    'client'            => $data->details->client[$i],
+                    'glaccount'         => $data->details->glaccount[$i],
+                    'glamount'          => $transamount
+                ]);
             }
 
 
