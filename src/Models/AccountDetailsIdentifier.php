@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace BluebeansSystems\Nephos\Models;
 
 class AccountDetailsIdentifier
 {
@@ -173,7 +173,7 @@ class AccountDetailsIdentifier
      */
     public function setTransactiontag($transactiontag)
     {
-        $this->transactiontag[] = $transactiontag;
+        $this->transactiontag = $transactiontag;
     }
 
     /**

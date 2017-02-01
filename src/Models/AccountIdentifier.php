@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace BluebeansSystems\Nephos\Models;
 
 class AccountIdentifier
 {

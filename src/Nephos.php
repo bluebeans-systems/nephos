@@ -2,9 +2,9 @@
 
 namespace BluebeansSystems\Nephos;
 
-use App\AccountDetailsIdentifier;
-use App\AccountIdentifier;
 use BluebeansSystems\Nephos\Models\AccountDetails;
+use BluebeansSystems\Nephos\Models\AccountDetailsIdentifier;
+use BluebeansSystems\Nephos\Models\AccountIdentifier;
 use BluebeansSystems\Nephos\Models\Accounts;
 use BluebeansSystems\Nephos\Models\AccountSummary;
 use BluebeansSystems\Nephos\Models\TransactionDetails;
