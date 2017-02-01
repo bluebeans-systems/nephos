@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransactionSummary extends Model {
 
-	protected $fillable = ['subscription','controlno','transactionrefno','module','user','status','posted_by','explanation','posted_at'];
+	protected $fillable = ['subscription','controlno','transactionrefno','module','transtype','client','docno','batchno','user','status','posted_by','explanation','posted_at','is_fo'];
 	
 	protected $table    = 'transaction_summary';
 

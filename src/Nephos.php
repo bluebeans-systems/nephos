@@ -79,11 +79,16 @@ class Nephos {
                 'controlno'             => $this->controlno,
                 'transactionrefno'      => $data->refno,
                 'module'                => $data->module,
+                'transtype'             => $data->transaction_type,
+                'client'                => $data->client,
+                'docno'                 => $data->docno,
+                'batchno'               => $data->batchno,
                 'user'                  => $data->user,
                 'status'                => $data->status,
                 'posted_by'             => $data->posted_by,
                 'explanation'           => $data->explanation,
-                'posted_at'             => $data->posted_at
+                'posted_at'             => $data->posted_at,
+                'is_fo'                 => $data->is_fo
             ]);
 
             for($i=0;$i<count($data->details->client);$i++)
@@ -96,7 +101,10 @@ class Nephos {
                     'controlno'             => $this->controlno,
                     'glaccount'             => $data->details->glaccount[$i],
                     'client'                => $data->details->client[$i],
+                    'seqno'                 => $i,
                     'transactionrefno'      => $data->refno,
+                    'module'                => $data->module,
+                    'transtype'             => $data->transaction_type,
                     'accountclass'          => $data->details->accountclass[$i],
                     'accounttype'           => $data->details->accounttype[$i],
                     'accountentry'          => $data->details->accountentry[$i],
@@ -135,7 +143,7 @@ class Nephos {
             for($i=0;$i<count($data->details->client);$i++)
             {
                 // Check for existing account
-                $accountno            = $this->accounts->checkAccount($data->subscription,$data->details->accountclass[$i],$data->details->accounttype[$i],$data->details->client[$i]);
+                $accountno            = $this->accounts->checkAccount($data->subscription,$data->refno,$data->details->accountclass[$i],$data->details->accounttype[$i],$data->details->client[$i]);
 
                 // Create new account summary
                 $this->accountSummary->create([
@@ -146,6 +154,7 @@ class Nephos {
                     'accounttype'       => $data->details->accounttype[$i],
                     'accountentry'      => $data->details->accountentry[$i],
                     'accountno'         => $accountno,
+                    'transactionrefno'  => $data->refno,
                     'user'              => $data->user
                 ]);
 
@@ -161,6 +170,7 @@ class Nephos {
                     'accounttype'       => $data->details->accounttype[$i],
                     'accountentry'      => $data->details->accountentry[$i],
                     'accountno'         => $accountno,
+                    'transactionrefno'  => $data->refno,
                     'amount'            => $transamount
                 ]);
 

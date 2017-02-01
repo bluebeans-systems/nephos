@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Accounts extends Model {
 
-	protected $fillable = ['subscription','accountno','accountclass','accounttype','client','user'];
+	protected $fillable = ['subscription','accountno','accountclass','accounttype','client','transactionrefno','user'];
 
 	protected $table = 'accounts';
 
@@ -25,7 +25,7 @@ class Accounts extends Model {
         return $this->hasMany('App\AccountDetails','accountno','accountno');
     }
 
-    public function checkAccount($subscription, $accountclass, $accounttype, $id)
+    public function checkAccount($subscription, $refno, $accountclass, $accounttype, $id)
     {
         $account    = $this->where('subscription',$subscription)
                            ->where('accountclass',$accountclass)
@@ -46,6 +46,7 @@ class Accounts extends Model {
                             'subscription'  => $subscription,
                             'accountclass'  => $accountclass,
                             'accounttype'   => $accounttype,
+                            'refno'         => $refno,
                             'id'            => $id,
                             'user'          => auth()->user()->id
                             ]);
@@ -68,6 +69,7 @@ class Accounts extends Model {
         $account->accountclass         = $array['accountclass'];
         $account->accounttype          = $array['accounttype'];
         $account->client               = $array['id'];
+        $account->transactionrefno     = $array['refno'];
         $account->user                 = $array['user'];
         $account->save();
 
