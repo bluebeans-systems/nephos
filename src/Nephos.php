@@ -408,7 +408,31 @@ class Nephos {
     }
 
     /**
-     * Generate Transaction Details
+     * Get Specific Transaction
+     *
+     * @param $controlno
+     * @return null
+     */
+    public function transaction($controlno)
+    {
+        $transaction   = null;
+
+        try {
+
+            $transaction        = TransactionSummary::where('controlno',$controlno)->firstOrFail();
+
+        } catch (\Exception $e) {
+
+            dd('Error: '.$e->getMessage());
+
+        }
+
+        return $transaction;
+    }
+
+    /**
+     * Generate Transaction Summary
+     *
      * @param $start_date
      * @param $end_date
      * @return null
@@ -419,7 +443,36 @@ class Nephos {
 
         try {
 
-            $transactions   = TransactionDetails::selectRaw('*,SUM(transamount) as total')->whereHas('transactionSummary', function($query) use ($start_date, $end_date) {
+            $transactions   = TransactionSummary::whereBetween('created_at',[$start_date, $end_date])->orderBy('created_at','DESC')->get();
+
+        } catch (\Exception $e) {
+
+            dd($e->getMessage());
+
+        }
+
+        return $transactions;
+    }
+
+    /**
+     * Generate Transaction Details
+     *
+     * @param $start_date
+     * @param $end_date
+     * @return null
+     */
+    public function transactionDetails($start_date, $end_date)
+    {
+        $transactions   = null;
+
+        try {
+
+            $transactions   = TransactionDetails::selectRaw('*,SUM(transamount) as total')
+                                ->whereHas('transactionSummary', function($query) use ($start_date, $end_date) {
+                                    if(is_null($start_date)) {
+                                        $start_date     = "1990-01-01";
+                                    }
+
                                     $query->whereBetween('posted_at',[$start_date,$end_date])
                                         ->where('status',2);
                                 })
