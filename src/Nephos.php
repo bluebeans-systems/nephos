@@ -94,7 +94,7 @@ class Nephos {
                 'controlno'             => $this->controlno,
                 'transactionrefno'      => $data->transactionrefno,
                 'module'                => $data->module,
-                'transtype'             => $data->transaction_type,
+                'transtype'             => $data->transtype,
                 'client'                => $data->client,
                 'docno'                 => $data->docno,
                 'batchno'               => $data->batchno,
@@ -152,7 +152,7 @@ class Nephos {
                     'transamount'           => $transamount,
                     'transamountdue'        => $transamount,
                     'paymentform'           => $data->details->paymentform[$i],
-                    'transactiontag'        => $data->details->transactiontag[$i]
+                    'transactiontag'        => $data->details->transactiontag
                 ]);
             }
 
@@ -201,7 +201,7 @@ class Nephos {
 
         try {
 
-            $summary    = $this->transactionSummary->where('controlno',$controlno)->firstOrFail();
+            $summary    = $this->transactionSummary->where('controlno',$controlno);
 
             $summary->update([
                 'client'                => $data->client,
@@ -214,7 +214,7 @@ class Nephos {
             ]);
 
             // Remove & Store Transaction Details
-            $summary->details()->delete();
+            $summary->first()->details()->delete();
 
             $this->saveTransactionDetails($controlno, $data);
 

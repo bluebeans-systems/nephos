@@ -12,4 +12,13 @@ class TransactionSummary extends Model {
 
     protected $dates    = ['posted_at'];
 
+    public function details()
+    {
+        return $this->hasMany('App\TransactionDetails','controlno','controlno');
+    }
+
+    public function getTag()
+    {
+        return $this->hasOne('App\TransactionTags','id','status');
+    }
 }
