@@ -18,7 +18,7 @@ class AccountTypes extends Model {
      */
     public function getGlControls()
     {
-        return $this->hasMany('App\GlControls','accounttype','id');
+        return $this->hasMany('BluebeansSystems\Nephos\Models\GlControls','accounttype','id');
     }
 
 
@@ -29,7 +29,7 @@ class AccountTypes extends Model {
      */
     public function getGlControl()
     {
-        return $this->hasOne('App\GlControls','accounttype','id');
+        return $this->hasOne('BluebeansSystems\Nephos\Models\GlControls','accounttype','id');
     }
 
 }

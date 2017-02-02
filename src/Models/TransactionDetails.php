@@ -10,4 +10,24 @@ class TransactionDetails extends Model {
 
 	protected $table = 'transaction_details';
 
+    public function transactionSummary()
+    {
+        return $this->hasOne('BluebeansSystems\Nephos\Models\TransactionSummary','controlno','controlno');
+    }
+
+    public function getGlAccount()
+    {
+        return $this->hasOne('BluebeansSystems\Nephos\Models\GlAccounts','glaccount','glaccount');
+    }
+
+    public function getAmountFormat($amount)
+    {
+        if($amount < 0) {
+            $new_amt    = '('.number_format($amount * -1, 2) .')';
+        } else {
+            $new_amt    = number_format($amount,2);
+        }
+
+        return $new_amt;
+    }
 }

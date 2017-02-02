@@ -12,17 +12,17 @@ class Accounts extends Model {
 
     public function getAccountType()
     {
-        return $this->hasOne('App\AccountTypes','id','accounttype');
+        return $this->hasOne('BluebeansSystems\Nephos\Models\AccountTypes','id','accounttype');
     }
 
     public function getAccountSummary()
     {
-        return $this->hasMany('App\AccountSummary','accountno','accountno');
+        return $this->hasMany('BluebeansSystems\Nephos\Models\AccountSummary','accountno','accountno');
     }
 
     public function getAccountDetails()
     {
-        return $this->hasMany('App\AccountDetails','accountno','accountno');
+        return $this->hasMany('BluebeansSystems\Nephos\Models\AccountDetails','accountno','accountno');
     }
 
     public function checkAccount($subscription, $refno, $accountclass, $accounttype, $id)

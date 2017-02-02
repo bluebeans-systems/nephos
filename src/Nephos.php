@@ -407,4 +407,32 @@ class Nephos {
         return $this->accountIdentifier;
     }
 
+    /**
+     * Generate Transaction Details
+     * @param $start_date
+     * @param $end_date
+     * @return null
+     */
+    public function transactions($start_date, $end_date)
+    {
+        $transactions   = null;
+
+        try {
+
+            $transactions   = TransactionDetails::selectRaw('*,SUM(transamount) as total')->whereHas('transactionSummary', function($query) use ($start_date, $end_date) {
+                                    $query->whereBetween('posted_at',[$start_date,$end_date])
+                                        ->where('status',2);
+                                })
+                                    ->groupBy('glaccount')
+                                    ->get();
+
+        } catch (\Exception $e) {
+
+            dd($e->getMessage());
+
+        }
+
+        return $transactions;
+    }
+
 }

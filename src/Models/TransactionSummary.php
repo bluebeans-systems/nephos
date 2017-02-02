@@ -14,11 +14,11 @@ class TransactionSummary extends Model {
 
     public function details()
     {
-        return $this->hasMany('App\TransactionDetails','controlno','controlno');
+        return $this->hasMany('BluebeansSystems\Nephos\Models\TransactionDetails','controlno','controlno');
     }
 
     public function getTag()
     {
-        return $this->hasOne('App\TransactionTags','id','status');
+        return $this->hasOne('BluebeansSystems\Nephos\Models\TransactionTags','id','status');
     }
 }

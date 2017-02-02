@@ -10,7 +10,7 @@ class AccountClass extends Model {
 
     public function getAccountTypes()
     {
-        return $this->hasMany('App\AccountTypes','accountclass','id');
+        return $this->hasMany('BluebeansSystems\Nephos\Models\AccountTypes','accountclass','id');
     }
 
 }
