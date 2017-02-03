@@ -28,6 +28,8 @@ class AccountIdentifier
 
     public $posted_by;
 
+    public $transaction_at;
+
     public $posted_at;
 
     public $transdate;
@@ -290,5 +292,21 @@ class AccountIdentifier
     public function setTransactionrefno($transactionrefno)
     {
         $this->transactionrefno = $transactionrefno;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTransactionAt()
+    {
+        return $this->transaction_at;
+    }
+
+    /**
+     * @param mixed $transaction_at
+     */
+    public function setTransactionAt($transaction_at)
+    {
+        $this->transaction_at = $transaction_at;
     }
 }

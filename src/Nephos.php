@@ -102,6 +102,7 @@ class Nephos {
                 'status'                => $data->status,
                 'posted_by'             => $data->posted_by,
                 'explanation'           => $data->explanation,
+                'transaction_at'        => $data->transaction_at,
                 'posted_at'             => $data->posted_at,
                 'is_fo'                 => $data->is_fo
             ]);
@@ -209,8 +210,10 @@ class Nephos {
                 'batchno'               => $data->batchno,
                 'user'                  => $data->user,
                 'status'                => $data->status,
+                'posted_by'             => $data->posted_by,
                 'explanation'           => $data->explanation,
-                'is_fo'                 => $data->is_fo
+                'transaction_at'        => $data->transaction_at,
+                'posted_at'             => $data->posted_at,
             ]);
 
             // Remove & Store Transaction Details
@@ -350,6 +353,7 @@ class Nephos {
         $tag            = $request->get('tag');
         $glaccounts     = $request->get('gl_account');
         $explanation    = $request->get('explanation');
+        $transaction_at = $this->carbon->parse($request->get('transaction_at'))->format('Y-m-d');
 
         try {
 
@@ -364,6 +368,7 @@ class Nephos {
             $this->accountIdentifier->setStatus($tag);
             $this->accountIdentifier->setPostedBy($user);
             $this->accountIdentifier->setExplanation($explanation);
+            $this->accountIdentifier->setTransactionAt($transaction_at);
             $this->accountIdentifier->setPostedAt($posted_at);
             $this->accountIdentifier->setIsFo($is_fo);
 
@@ -443,7 +448,10 @@ class Nephos {
 
         try {
 
-            $transactions   = TransactionSummary::whereBetween('created_at',[$start_date, $end_date])->orderBy('created_at','DESC')->get();
+            $transactions   = TransactionSummary::whereBetween('created_at',[$this->carbon->parse($start_date), $this->carbon->parse($end_date)->hour(11)->minute(59)->second(59)])
+                                                ->orderBy('controlno')
+                                                ->orderBy('created_at','DESC')
+                                                ->get();
 
         } catch (\Exception $e) {
 
@@ -473,8 +481,8 @@ class Nephos {
                                         $start_date     = "1990-01-01";
                                     }
 
-                                    $query->whereBetween('posted_at',[$start_date,$end_date])
-                                        ->where('status',2);
+                                    $query->whereBetween('posted_at',[$this->carbon->parse($start_date),$this->carbon->parse($end_date)->hour(11)->minute(59)->second(59)])
+                                          ->where('status',2);
                                 })
                                     ->groupBy('glaccount')
                                     ->get();
