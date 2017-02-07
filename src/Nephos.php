@@ -7,10 +7,12 @@ use BluebeansSystems\Nephos\Models\AccountDetailsIdentifier;
 use BluebeansSystems\Nephos\Models\AccountIdentifier;
 use BluebeansSystems\Nephos\Models\Accounts;
 use BluebeansSystems\Nephos\Models\AccountSummary;
+use BluebeansSystems\Nephos\Models\GlAccounts;
 use BluebeansSystems\Nephos\Models\TransactionDetails;
 use BluebeansSystems\Nephos\Models\TransactionSummary;
 use BluebeansSystems\Nephos\Models\GlTransactionDetails;
 use BluebeansSystems\Nephos\Models\GlTransactionSummary;
+use BluebeansSystems\Nephos\Models\TransactionTags;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -63,6 +65,7 @@ class Nephos {
         $this->accountDetails               = new AccountDetails();
         $this->glSummary                    = new GlTransactionSummary();
         $this->glDetails                    = new GlTransactionDetails();
+        $this->glAccounts                   = new GlAccounts();
 
         $this->accountIdentifier            = new AccountIdentifier();
         $this->accountDetailsIdentifier     = new AccountDetailsIdentifier();
@@ -208,6 +211,7 @@ class Nephos {
                 'client'                => $data->client,
                 'docno'                 => $data->docno,
                 'batchno'               => $data->batchno,
+                'seqno'                 => $data->seqno,
                 'user'                  => $data->user,
                 'status'                => $data->status,
                 'posted_by'             => $data->posted_by,
@@ -494,6 +498,101 @@ class Nephos {
         }
 
         return $transactions;
+    }
+
+    /**
+     * Generate Asset Accounts Array
+     *
+     */
+    public function getAssetAccounts()
+    {
+        $accounts   = [];
+
+        foreach($this->glAccounts->all() as $glaccount) {
+            if($glaccount->isAsset() && $glaccount->isDetail()) {
+                $accounts[$glaccount->getGlAccountType->description][$glaccount->glaccount]  = $glaccount->description;
+            }
+        }
+
+        return $accounts;
+    }
+
+    /**
+     * Generate Liability Accounts Array
+     *
+     */
+    public function getLiabilityAccounts()
+    {
+        $accounts   = [];
+
+        foreach($this->glAccounts->all() as $glaccount) {
+            if($glaccount->isLiability() && $glaccount->isDetail()) {
+                $accounts[$glaccount->getGlAccountType->description][$glaccount->glaccount]  = $glaccount->description;
+            }
+        }
+
+        return $accounts;
+    }
+
+    /**
+     * Generate Revenue Accounts Array
+     *
+     */
+    public function getRevenueAccounts()
+    {
+        $accounts   = [];
+
+        foreach($this->glAccounts->all() as $glaccount) {
+            if($glaccount->isRevenue() && $glaccount->isDetail()) {
+                $accounts[$glaccount->getGlAccountType->description][$glaccount->glaccount]  = $glaccount->description;
+            }
+        }
+
+        return $accounts;
+    }
+
+    /**
+     * Generate Expense Accounts Array
+     *
+     */
+    public function getExpenseAccounts()
+    {
+        $accounts   = [];
+
+        foreach($this->glAccounts->all() as $glaccount) {
+            if($glaccount->isExpense() && $glaccount->isDetail()) {
+                $accounts[$glaccount->getGlAccountType->description][$glaccount->glaccount]  = $glaccount->description;
+            }
+        }
+
+        return $accounts;
+    }
+
+    /**
+     * Generate Equity Accounts Array
+     *
+     */
+    public function getEquityAccounts()
+    {
+        $accounts   = [];
+
+        foreach($this->glAccounts->all() as $glaccount) {
+            if($glaccount->isExpense() && $glaccount->isDetail()) {
+                $accounts[$glaccount->getGlAccountType->description][$glaccount->glaccount]  = $glaccount->description;
+            }
+        }
+
+        return $accounts;
+    }
+
+    /**
+     * Get Transaction Tags collection
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getTransactionTags()
+    {
+        return TransactionTags::all()->pluck('tag','name');
     }
 
 }

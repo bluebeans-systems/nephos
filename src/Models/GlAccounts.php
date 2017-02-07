@@ -6,13 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class GlAccounts extends Model {
 
-	protected $fillable = ['subscription','gltype','glsummary','glaccount','description','gllevel','status','user'];
+    protected $fillable = ['subscription','gltype','glsummary','glaccount','description','gllevel','status','user'];
 
-	protected $table = 'glaccounts';
+    protected $table    = 'glaccounts';
 
     public function getGlAccountType()
     {
         return $this->hasOne('BluebeansSystems\Nephos\Models\GlAccountTypes','id','gltype');
+    }
+
+    public function isSummary()
+    {
+        return $this->gllevel==1 ? true : false;
+    }
+
+    public function isDetail()
+    {
+        return $this->gllevel==2 ? true : false;
     }
 
     public function isAsset()
