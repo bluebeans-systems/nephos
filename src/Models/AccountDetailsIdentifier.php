@@ -237,6 +237,6 @@ class AccountDetailsIdentifier
      */
     public function setSeqno($seqno)
     {
-        $this->seqno = $seqno;
+        $this->seqno[] = $seqno;
     }
 }

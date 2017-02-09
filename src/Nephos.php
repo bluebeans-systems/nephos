@@ -2,6 +2,8 @@
 
 namespace BluebeansSystems\Nephos;
 
+use App\FrontOfficeTransaction;
+use App\ProductTransaction;
 use BluebeansSystems\Nephos\Models\AccountDetails;
 use BluebeansSystems\Nephos\Models\AccountDetailsIdentifier;
 use BluebeansSystems\Nephos\Models\AccountIdentifier;
@@ -146,7 +148,7 @@ class Nephos {
                     'controlno'             => $controlno,
                     'glaccount'             => $data->details->glaccount[$i],
                     'client'                => $data->details->client[$i],
-                    'seqno'                 => $data->details->seqno,
+                    'seqno'                 => $data->details->seqno[$i],
                     'transactionrefno'      => $data->transactionrefno,
                     'module'                => $data->module,
                     'transtype'             => $data->transtype,
@@ -168,6 +170,53 @@ class Nephos {
         }
 
         DB::commit();
+    }
+
+    /**
+     * Save Front Office Transaction
+     *
+     * @param $controlno
+     * @param Request $request
+     */
+    public function saveFrontOfficeTransaction($controlno, Request $request)
+    {
+        $fo                     = new FrontOfficeTransaction();
+
+        $receiptno              = $fo->max('receiptno') + 1;
+
+        $fo->controlno          = $controlno;
+        $fo->client             = 1;
+        $fo->transactionrefno   = $controlno;
+        $fo->transactiontype    = 30; // POS
+        $fo->receiptno          = $receiptno;
+        $fo->user               = $request->user()->id;
+        $fo->save();
+    }
+
+    /**
+     * Save Product Transaction
+     *
+     * @param $controlno
+     * @param Request $request
+     */
+    public function saveProductTransaction($controlno, Request $request)
+    {
+        foreach($request->get('products') as $val)
+        {
+            ProductTransaction::create([
+                'controlno'             => $controlno,
+                'transactionrefno'      => $controlno,
+                'transactiontype'       => 30, // POS
+                'entrytype'             => 9,  // POS Receipt
+                'product'               => $val["Key"],
+                'pricetype'             => 1, // Retail Price
+                'quantity'              => $val["Value"]["Key"],
+                'amount'                => $val["Value"]["Value"],
+                'remarks'               => "",
+                'user'                  => $request->user()->id
+            ]);
+
+        }
     }
 
     /**
@@ -211,7 +260,6 @@ class Nephos {
                 'client'                => $data->client,
                 'docno'                 => $data->docno,
                 'batchno'               => $data->batchno,
-                'seqno'                 => $data->seqno,
                 'user'                  => $data->user,
                 'status'                => $data->status,
                 'posted_by'             => $data->posted_by,
@@ -266,9 +314,6 @@ class Nephos {
                     'user'              => $data->user
                 ]);
 
-                // reversal only
-                $transamount    = $data->status=="4" ? $data->details->transamount[$i] > 0 ? $data->details->transamount[$i] * -1 : $data->details->transamount[$i] * 1 : $data->details->transamount[$i];
-
                 // Create account details
                 $this->accountDetails->create([
                     'subscription'      => $data->subscription,
@@ -279,7 +324,7 @@ class Nephos {
                     'accountentry'      => $data->details->accountentry[$i],
                     'accountno'         => $accountno,
                     'transactionrefno'  => $data->refno,
-                    'amount'            => $transamount
+                    'amount'            => $data->details->transamount[$i]
                 ]);
 
             }
@@ -296,6 +341,7 @@ class Nephos {
 
     /**
      * Post GL Transaction
+     *
      * @param $data
      */
     public function postGlTransaction($data)
@@ -308,8 +354,6 @@ class Nephos {
 
             for($i=0;$i<count($data->details->client);$i++)
             {
-                $transamount    = $data->status=="4" ? $data->details->transamount[$i] > 0 ? $data->details->transamount[$i] * -1 : $data->details->transamount[$i] * 1 : $data->details->transamount[$i];
-
                 $this->glDetails->create([
                     'subscription'      => $data->subscription,
                     'controlno'         => $data->controlno,
@@ -318,7 +362,7 @@ class Nephos {
                     'accountentry'      => $data->details->accountentry[$i],
                     'client'            => $data->details->client[$i],
                     'glaccount'         => $data->details->glaccount[$i],
-                    'glamount'          => $transamount
+                    'glamount'          => $data->details->transamount[$i]
                 ]);
             }
 
@@ -343,7 +387,6 @@ class Nephos {
      */
     public function accountIdentifier(Request $request, array $attributes = [], $subscription)
     {
-
         $user           = $attributes['user'];
         $module         = $attributes['module'];
         $refno          = $attributes['refno'];
